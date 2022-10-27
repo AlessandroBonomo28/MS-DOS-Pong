@@ -14,57 +14,9 @@ WriteChar MACRO x, y, char, color
     
 ENDM
 
-DrawRect MACRO x, y, width, height, color
-        
-            
-        
-         mov dx,0
-        
-         mov ax,0 ;init counter ax 
-loop1:   mov cx,0  
-loop2:   push ax
-         push cx ; conserva i counter nello stack
-         
-         
-         
-         
-         nop ; operazioni a piacere for annidato
-         
-          ; set graphics video mode. 
-    	  
-    	 pop cx ; cx = ax counter (yoff)
-    	 pop ax ; ax = cx counter = xoff
-    	 
-    	 mov bx,cx ; bx = cx (ax counter)
-    	 
-    	 add cx,y    ; cx = y of pixel for int10h
-    	 
-    	 mov dx,ax
-    	 
-    	 add dx, x   ; dx = x of pixel for int10h 
-    	 
-    	 push ax
-    	 push bx
-    	 
-    	 mov ah, 0ch
-    	 mov al, color
-    	 int 10h     ; set pixel
-         
-         
-         
-         pop cx
-         pop ax ; ripristina i counter
-         inc cx
-         ; fine op for annidato        
-         cmp cx,width  ; iterazioni for annidato
-         jne loop2 
-         inc ax          
-         cmp ax,height  ; iterazioni primo for 
-         jne loop1    
-        
- 
-    
-ENDM
+
+
+
 
 
 
@@ -89,13 +41,20 @@ org 100h
         ;0Fch = white
         
         WriteChar 5,5,49,0Fch
-        ;WriteChar 5,6,50,03ch
         
         
-        ;LEA BX,wBall
-        DrawRect 5,5,50,50,1100b 
         
-        ;DrawRect 0,0,5,5,1100b
+        
+        call DrawRect 
+        
+        LEA bx,xDraw
+        mov word ptr [bx], 0005h
+        
+        LEA bx,yDraw
+        mov word ptr [bx], 0005h
+        
+        call DrawRect 
+        
         
         
 loop:   MOV AH,01h
@@ -105,15 +64,85 @@ loop:   MOV AH,01h
         NOP
         
         
-        jne end  ; esci se ricevi input (ZF=0)
+        jne endlabel  ; esci se ricevi input (ZF=0)
         jmp loop
-end:        
-        ret
-              
-              
-              
-        wBall DW 000Ah      
-        xBall DW 0019h ; intero
-        yBall DW 000Fh ; intero
+endlabel:   
 
 
+
+
+
+     
+RET
+
+
+xDraw DW 0000h
+yDraw DW 0000h
+widthDraw  DW 0005h
+heightDraw DW 0005h
+colorDraw DB 1100b
+
+              
+DrawRect PROC 
+              
+         mov ax,0 ;init counter ax 
+loop1:   mov cx,0  
+loop2:   push ax
+         push cx ; conserva i counter nello stack
+         
+         
+         
+         
+         nop ; operazioni a piacere for annidato
+         
+          ; set graphics video mode. 
+    	  
+    	 pop cx ; cx = ax counter (yoff)
+    	 pop ax ; ax = cx counter = xoff
+    	 
+    	 mov bx,cx ; bx = cx (ax counter)
+    	 
+    	 mov dx,yDraw
+    	 add cx,dx    ; cx = y of pixel for int10h
+    	 
+         	 
+    	 mov dx,xDraw
+    	 add dx,ax ; dx = x of pixel for int10h 
+    	 
+    	    
+    	 
+    	 push ax
+    	 push bx
+    	 
+    	 push dx
+    	 
+    	 mov ah, 0ch
+    	 mov dl, colorDraw
+    	 mov al, dl
+    	 
+    	 pop dx
+    	 
+    	 int 10h     ; set pixel
+         
+         
+         
+         pop cx
+         pop ax ; ripristina i counter
+         inc cx
+         ; fine op for annidato 
+         mov dx,widthDraw       
+         cmp cx,dx  ; iterazioni for annidato
+         jne loop2 
+         inc ax 
+         mov dx,heightDraw         
+         cmp ax,dx  ; iterazioni primo for 
+         jne loop1    
+        
+RET
+    
+ENDP
+              
+
+
+
+END

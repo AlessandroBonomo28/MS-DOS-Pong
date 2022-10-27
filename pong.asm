@@ -68,12 +68,14 @@ ENDM
 
 
 
-CreateWindow MACRO ; graphical mode. 40x25. 256 colors. 320x200 pixels. 1 page.
- 
+CreateWindow MACRO 
+                 ; 03h text mode
     
-
+                 ; 13h graphical mode. 40x25. 256 colors. 320x200 pixels. 1 page. 
+                 ; 12h  12h = G  80x30	 8x16  640x480	 16/256K  .   A000 VGA,ATI VIP
+                 ; MS DOS usa 12h resolution
     
-    MOV AL, 13h   ; 03h text mode - 13h graphic mode
+    MOV AL, 12h   
     MOV AH, 0
     int 10h 
     
@@ -86,7 +88,7 @@ org 100h
         
         ;0Fch = white
         
-        ;WriteChar 5,5,49,0Fch
+        WriteChar 5,5,49,0Fch
         ;WriteChar 5,6,50,03ch
         
         

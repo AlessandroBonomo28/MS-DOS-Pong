@@ -493,14 +493,14 @@ next2:
         jmp next3 
         
 dwnkey2:mov dx,yPlayer2
-        push dx
+        
         
         add dx,heightPlayer
         mov cx,yMax
         cmp dx,cx
         jae flush
         
-        pop dx
+        mov dx, yPlayer2
         inc dx
         
         LEA bx,yPlayer2

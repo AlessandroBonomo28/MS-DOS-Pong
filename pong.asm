@@ -115,7 +115,14 @@ loop:   NOP
         ; START check ball_bottom hit left wall and change xDirBall
         
         mov ax,xBall
-        cmp ax,0000h ; se xBall = 0
+        ; CASO xBall = 0
+        cmp ax,0000h
+        je p1loss
+         
+        mov dx,xOffPlayer
+        add dx,widthPlayer
+        
+        cmp ax,dx ; se xBall = xOffPlayer+widthPlayer
         jne cansub1
            
         ; caso xBall = 0
@@ -125,8 +132,21 @@ loop:   NOP
         jne cansub1  
         
         ; caso xDirBall = -1 
-                    
-        LEA bx,xDirBall
+        
+        mov dx,yPlayer1
+        mov cx,yBall
+        cmp cx,dx; se xBall >= yplayer
+        jae cond1
+        jmp cansub1
+cond1:  
+        mov bx,heightPlayer
+        
+        add dx,bx
+        cmp cx,dx
+        jb hitp1
+        jmp cansub1
+                   
+hitp1:  LEA bx,xDirBall
         mov byte ptr [bx], 0b ; set xDirBall = 0 
         
 cansub1:; xBall > 0, END check wall for xDirBall
@@ -324,11 +344,60 @@ nokeys:
         
         ;jne endprogram  ; esci se ricevi input (ZF=0)
         jmp loop
+
+p1loss: 
+        LEA bx,charColor   
+        mov byte ptr [bx], 0001b
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 80 ;P
+        LEA bx,xChar   
+        mov byte ptr [bx], 0Ah ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 05 ;y
+        call WriteChar
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 49 ;1 
+        LEA bx,xChar   
+        mov byte ptr [bx], 0Bh ;x
+        call WriteChar
+        
+        LEA bx,charColor   
+        mov byte ptr [bx], 1100b 
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 76 ;L 
+        LEA bx,xChar   
+        mov byte ptr [bx], 0Dh ;x
+        call WriteChar
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 79 ;O 
+        LEA bx,xChar   
+        mov byte ptr [bx], 0Eh ;x
+        call WriteChar 
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 83 ;S 
+        LEA bx,xChar   
+        mov byte ptr [bx], 0Fh ;x
+        call WriteChar
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 83 ;S 
+        LEA bx,xChar   
+        mov byte ptr [bx], 10h ;x
+        call WriteChar
+        
 endprogram:   
 
+        
+MOV CX,001Eh
+MOV DX,8480h ;2s 
 
-
-
+MOV AH, 86h
+INT 15h    ;delay
 
      
 RET
@@ -386,7 +455,7 @@ ENDP
 xChar DB 05h
 yChar DB 05h
 charToWrite  DB 49
-charColor  DB 1010b
+charColor  DB 0001b
 
 WriteChar PROC 
      
@@ -420,8 +489,8 @@ yMax DW 01DFh ; = 479
 xBall DW 017Fh
 yBall DW 0190h
 ballWidth DW 0005h
-xDirBall DB 0b
-yDirBall DB 1b 
+xDirBall DB 1b
+yDirBall DB 0b 
 ballColor  DB 1010b  
 
 

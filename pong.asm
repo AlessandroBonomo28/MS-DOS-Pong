@@ -1,3 +1,192 @@
+MACRO HowToPlay
+        LEA bx,charColor   
+        mov byte ptr [bx], 0001b
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 80 ;P
+        LEA bx,xChar   
+        mov byte ptr [bx], 05h ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 05h ;y
+        call WriteChar
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 49 ;1 
+        LEA bx,xChar   
+        mov byte ptr [bx], 06h ;x
+        call WriteChar
+         
+        LEA bx,charColor   
+        mov byte ptr [bx], 1111b
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 24d ; freccia su
+        LEA bx,xChar   
+        mov byte ptr [bx], 0Ah ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 05h ;y
+        call WriteChar    
+        
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 87d ; W
+        LEA bx,xChar   
+        mov byte ptr [bx], 0Ch ;x
+        LEA bx,yChar         
+        mov byte ptr [bx], 05h ;y
+        call WriteChar   
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 25d ; freccia giu
+        LEA bx,xChar   
+        mov byte ptr [bx], 0Ah ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 08h ;y
+        call WriteChar    
+        
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 83d ; S
+        LEA bx,xChar   
+        mov byte ptr [bx], 0Ch ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 08h ;y
+        call WriteChar  
+        
+        ;----
+        
+        LEA bx,charColor   
+        mov byte ptr [bx], 0001b
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 80 ;P
+        LEA bx,xChar   
+        mov byte ptr [bx], 15h ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 05h ;y
+        call WriteChar
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 50 ;2 
+        LEA bx,xChar   
+        mov byte ptr [bx], 16h ;x
+        call WriteChar
+         
+        LEA bx,charColor   
+        mov byte ptr [bx], 1111b
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 24d ; freccia su
+        LEA bx,xChar   
+        mov byte ptr [bx], 1Ah ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 05h ;y
+        call WriteChar    
+        
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 73d ; I
+        LEA bx,xChar   
+        mov byte ptr [bx], 1Ch ;x
+        LEA bx,yChar         
+        mov byte ptr [bx], 05h ;y
+        call WriteChar   
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 25d ; freccia giu
+        LEA bx,xChar   
+        mov byte ptr [bx], 1Ah ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 08h ;y
+        call WriteChar    
+        
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 75d ; K
+        LEA bx,xChar   
+        mov byte ptr [bx], 1Ch ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 08h ;y
+        call WriteChar
+        
+        ;----
+        
+        LEA bx,charColor   
+        mov byte ptr [bx], 1100b
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 83d ;s
+        LEA bx,xChar   
+        mov byte ptr [bx], 05h ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 0Fh ;y
+        call WriteChar
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 84d ;t
+        LEA bx,xChar   
+        mov byte ptr [bx], 06h ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 0Fh ;y
+        call WriteChar
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 65d ;a
+        LEA bx,xChar   
+        mov byte ptr [bx], 07h ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 0Fh ;y
+        call WriteChar
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 82d ;r
+        LEA bx,xChar   
+        mov byte ptr [bx], 08h ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 0Fh ;y
+        call WriteChar
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 84d ;t
+        LEA bx,xChar   
+        mov byte ptr [bx], 09h ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 0Fh ;y
+        call WriteChar 
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 16d ;play
+        LEA bx,xChar   
+        mov byte ptr [bx], 0Bh ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 0Fh ;y
+        call WriteChar   
+        
+loop0:    
+        MOV AH,01h
+        INT 16H  ; interrupt check input
+        
+        ; al now contains keypressed
+        jne press0 
+        jmp nokeys0  
+        
+press0: 
+        
+        mov ah,0ch
+        mov al,0
+        int 21h ; flush buffer
+        jmp endmacro0
+nokeys0:
+        
+        jmp loop0
+
+endmacro0:
+mov ah,0
+mov al,12h
+int 10h  ;clear screen    
+    
+ENDM
+
 org 100h
 
         MOV AL, 12h   
@@ -6,10 +195,11 @@ org 100h
         ; mode 12h:
         ; text res: 80x30, pixel box: 8x16  
         ; pixel res: 640x480, colors: 16/256K
-        ; video mem address: A000, system: VGA,ATI VIP
-loop:   NOP
-
-        LEA bx,xDraw
+        ; video mem address: A000, system: VGA,ATI VIP 
+        HowToPlay
+        
+        
+loop:   LEA bx,xDraw
         mov ax,xBall
         mov word ptr [bx], ax ; set xDraw = xBall
         
@@ -262,11 +452,11 @@ endinc2:
         jne press 
         jmp nokeys  
         
-press:  cmp al,77h ; w pressed
-        je wpress
+press:  cmp al,73h ; s pressed
+        je dwnkey1
         jmp next1 
         
-wpress: mov dx,yPlayer1
+dwnkey1:mov dx,yPlayer1
         push dx
         
         add dx,heightPlayer
@@ -281,11 +471,11 @@ wpress: mov dx,yPlayer1
         mov word ptr [bx], dx
 next1:  
 
-        cmp al,73h ; s pressed
-        je spress
+        cmp al,77h ; w pressed
+        je upkey1
         jmp next2 
         
-spress: mov dx,yPlayer1
+upkey1: mov dx,yPlayer1
         
         cmp dx,0000h
         je flush
@@ -298,11 +488,11 @@ next2:
 
 ;------------
 
-        cmp al,69h ; i pressed
-        je ipress
+        cmp al,6Bh ; k pressed
+        je dwnkey1
         jmp next3 
         
-ipress: mov dx,yPlayer2
+dwnkey2:mov dx,yPlayer2
         push dx
         
         add dx,heightPlayer
@@ -317,11 +507,11 @@ ipress: mov dx,yPlayer2
         mov word ptr [bx], dx
 next3:  
 
-        cmp al,6Bh ; k pressed
-        je kpress
+        cmp al,69h ; i pressed
+        je upkey2
         jmp next4 
         
-kpress: mov dx,yPlayer2
+upkey2: mov dx,yPlayer2
         
         cmp dx,0000h
         je flush

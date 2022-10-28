@@ -489,7 +489,7 @@ next2:
 ;------------
 
         cmp al,6Bh ; k pressed
-        je dwnkey1
+        je dwnkey2
         jmp next3 
         
 dwnkey2:mov dx,yPlayer2

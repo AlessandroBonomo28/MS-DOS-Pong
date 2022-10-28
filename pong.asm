@@ -1,24 +1,12 @@
-; 03h text mode   
-; 13h graphical mode. 40x25. 256 colors. 320x200 pixels. 1 page. 
-; 12h  12h = G  80x30	 8x16  640x480	 16/256K  .   A000 VGA,ATI VIP
-; MS DOS usa 12h resolution
-
-CreateWindow MACRO 
-                 
-    MOV AL, 12h   
-    MOV AH, 0
-    int 10h 
-    
-ENDM
-
 org 100h
 
-        CreateWindow
-        
-        ;LEA bx,charToWrite   
-        ;mov byte ptr [bx], 50
-        ;call WriteChar
-        
+        MOV AL, 12h   
+        MOV AH, 0
+        int 10h  ; set MSDOS compatible video mode
+        ; mode 12h:
+        ; text res: 80x30, pixel box: 8x16  
+        ; pixel res: 640x480, colors: 16/256K
+        ; video mem address: A000, system: VGA,ATI VIP
 loop:   NOP
 
         LEA bx,xDraw
@@ -91,54 +79,40 @@ loop:   NOP
         
         call DrawRect ; draw player 2
         
-        
-        ;MOV CX, 0001h
-        ;MOV DX, 86A0h ;100ms 
-        
-        ;MOV CX,0000h
-        ;MOV DX,03E8h ;1ms 
-        
-        ;MOV AH, 86h
-        ;INT 15h    ;delay  
-        
         mov ah,0
         mov al,12h
         int 10h  ;clear screen
         
-        ;LEA bx,colorDraw   
-        ;mov byte ptr [bx], 0000b ; set colorDraw = black
+        ;----------------------------
         
-        ;call DrawRect ; erase ball
-        
-        
-        ;-------------------
-        ; START check ball_bottom hit left wall and change xDirBall
+        ; check ball_bottom hit left wall
         
         mov ax,xBall
-        ; CASO xBall = 0
         cmp ax,0000h
-        je p1loss
-         
+        je p1loss 
+        
+        ; xBall is 0 
+        
         mov dx,xOffPlayer
         add dx,widthPlayer
         
-        cmp ax,dx ; se xBall = xOffPlayer+widthPlayer
+        cmp ax,dx ; if xBall = xOffPlayer+widthPlayer
         jne cansub1
            
-        ; caso xBall = 0
+        ; xBall = xOffPlayer+widthPlayer
         
         mov bl,xDirBall
         cmp bl,1b  ; se xDir = -1
         jne cansub1  
         
-        ; caso xDirBall = -1 
+        ; xDirBall = -1 
         
         mov dx,yPlayer1
         mov cx,yBall
-        cmp cx,dx; se xBall >= yplayer
-        jae cond1
+        cmp cx,dx; if xBall >= yPlayer1
+        jae condp1
         jmp cansub1
-cond1:  
+condp1:  
         mov bx,heightPlayer
         
         add dx,bx
@@ -146,15 +120,16 @@ cond1:
         jb hitp1
         jmp cansub1
                    
-hitp1:  LEA bx,xDirBall
-        mov byte ptr [bx], 0b ; set xDirBall = 0 
+hitp1:  LEA bx,xDirBall ; if yPlayer2 + heightPlayer < yBall
+        mov byte ptr [bx], 0b ; set xDirBall = 0 (positive direction)
         
-cansub1:; xBall > 0, END check wall for xDirBall
+cansub1:
+        ; ball will not hit left wall and player
         
         
         ;-------------------
                             
-        ; START check ball_bottom hit down wall and change yDirBall
+        ; check ball_bottom hit down wall
         
         mov ax,yBall
         cmp ax,0000h ; se yBall = 0
@@ -169,35 +144,60 @@ cansub1:; xBall > 0, END check wall for xDirBall
         ; caso yDirBall = -1 
                     
         LEA bx,yDirBall
-        mov byte ptr [bx], 0b ; set yDirBall = 0 
+        mov byte ptr [bx], 0b ; set yDirBall = 0 (positive direction)
         
-cansub2: ; yBall > 0, END check wall for yDirBall
+cansub2: ; ball will not hit down wall
                             
         ;-------------------
                             
-        ; START check ball_top hit right wall and change xDirBall
+        ; check ball_top hit right wall
+        
         mov ax,xBall
         mov bx,ballWidth
         add ax,bx 
-        cmp ax,xMax ; se xBall+ballWidth = xMax
+        mov cx,xMax
+        cmp ax,cx ; if xBall+ballWidth = xMax
+        je p2loss
+        
+        
+        mov ax,xBall
+        mov bx,ballWidth
+        add ax,bx 
+        mov cx,xMax
+        sub cx,xOffPlayer
+        cmp ax,cx ; if xBall+ballWidth = xMax - xOffPlayer
         jne canadd1
                            
-        ; caso xBall+ballWidth = xMax
+        ; xBall+ballWidth = xMax - xOffPlayer
         
         mov bl,xDirBall
-        cmp bl,0b  ; se xDir = 1
+        cmp bl,0b  ; if xDir = 1
         jne canadd1                      
         
-        ; caso xDirBall = 1 
-                    
-        LEA bx,xDirBall
-        mov byte ptr [bx], 1b ; set xDirBall = 0 
+        ; xDirBall = 1 
         
-canadd1: ; xBall > 0, END check wall for xDirBall
+        mov dx,yPlayer2
+        mov cx,yBall
+        add cx,ballWidth
+        cmp cx,dx ; if yBall+ballWidth >= yPlayer2
+        jae condp2
+        jmp canadd1
+condp2:  
+        mov bx,heightPlayer
+        
+        add dx,bx
+        cmp cx,dx ; if yPlayer2 + heightPlayer < yBall +ballWidth
+        jb hitp2
+        jmp canadd1
+                   
+hitp2:  LEA bx,xDirBall
+        mov byte ptr [bx], 1b ; set xDirBall = 1 (negative direction) 
+        
+canadd1: ; ball will not touch right wall and player2
                    
         ;-------------------
         
-        ; START check ball_top hit up wall and change yDirBall
+        ; check ball_top hit up wall
         mov ax,yBall
         mov bx,ballWidth
         add ax,bx 
@@ -207,27 +207,27 @@ canadd1: ; xBall > 0, END check wall for xDirBall
         ; caso yBall+ballWidth = yMax
         
         mov bl,yDirBall
-        cmp bl,0b  ; se xDir = 1
+        cmp bl,0b  ; se yDir = 1
         jne canadd2                      
         
-        ; caso xDirBall = 1 
+        ; caso yDirBall = 1 
                     
         LEA bx,yDirBall
-        mov byte ptr [bx], 1b ; set xDirBall = 0 
+        mov byte ptr [bx], 1b ; set yDirBall = 1 (negative direction) 
         
-canadd2: ; xBall > 0, END check wall for xDirBall
+canadd2: ; ball will not hit top wall
                    
         ;-------------------
         
-        ; change x
+        ; update xBall
            
         
         mov ax,xBall
         
         mov bl, xDirBall
-        cmp bl,1b ; se xDirBall = -1
+        cmp bl,1b
         je decr1
-        add ax,0001h  ;incremento
+        add ax,0001h  
         jmp endinc1 
 decr1:  sub ax,0001h      
 endinc1:        
@@ -236,15 +236,15 @@ endinc1:
         LEA bx,xBall
         mov word ptr [bx], ax 
         
-        ; change y 
+        ; update yBall
         
         
         mov ax,yBall
         
         mov bl, yDirBall
-        cmp bl,1b ; se yDirBall = -1
+        cmp bl,1b
         je decr2
-        add ax,0001h  ;incremento
+        add ax,0001h  
         jmp endinc2 
 decr2:  sub ax,0001h      
 endinc2:
@@ -258,11 +258,11 @@ endinc2:
         MOV AH,01h
         INT 16H  ; interrupt check input
         
-        ; al contains keypressed
+        ; al now contains keypressed
         jne press 
         jmp nokeys  
         
-press:  cmp al,77h ; w press
+press:  cmp al,77h ; w pressed
         je wpress
         jmp next1 
         
@@ -281,7 +281,7 @@ wpress: mov dx,yPlayer1
         mov word ptr [bx], dx
 next1:  
 
-        cmp al,73h ; s press
+        cmp al,73h ; s pressed
         je spress
         jmp next2 
         
@@ -298,7 +298,7 @@ next2:
 
 ;------------
 
-        cmp al,69h ; i press
+        cmp al,69h ; i pressed
         je ipress
         jmp next3 
         
@@ -317,7 +317,7 @@ ipress: mov dx,yPlayer2
         mov word ptr [bx], dx
 next3:  
 
-        cmp al,6Bh ; k press
+        cmp al,6Bh ; k pressed
         je kpress
         jmp next4 
         
@@ -342,7 +342,6 @@ flush:  mov ah,0ch
         
 nokeys:
         
-        ;jne endprogram  ; esci se ricevi input (ZF=0)
         jmp loop
 
 p1loss: 
@@ -363,7 +362,27 @@ p1loss:
         mov byte ptr [bx], 0Bh ;x
         call WriteChar
         
+        jmp msg
+p2loss: 
+
         LEA bx,charColor   
+        mov byte ptr [bx], 0001b
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 80 ;P
+        LEA bx,xChar   
+        mov byte ptr [bx], 0Ah ;x
+        LEA bx,yChar   
+        mov byte ptr [bx], 05 ;y
+        call WriteChar
+        
+        LEA bx,charToWrite   
+        mov byte ptr [bx], 50 ;2 
+        LEA bx,xChar   
+        mov byte ptr [bx], 0Bh ;x
+        call WriteChar
+               
+msg:    LEA bx,charColor   
         mov byte ptr [bx], 1100b 
         
         LEA bx,charToWrite   
@@ -390,15 +409,12 @@ p1loss:
         mov byte ptr [bx], 10h ;x
         call WriteChar
         
-endprogram:   
-
+        MOV CX,001Eh
+        MOV DX,8480h ;2s 
         
-MOV CX,001Eh
-MOV DX,8480h ;2s 
-
-MOV AH, 86h
-INT 15h    ;delay
-
+        MOV AH, 86h
+        INT 15h    ;delay
+endprogram:
      
 RET
 
@@ -418,10 +434,10 @@ loop1:   mov cx,0 ; init counter for annidato
 loop2:   mov bx,cx ; copia counter cx in bx
     	 
     	 mov dx,xDraw
-    	 add cx,dx    ; cx = x of pixel for int10h
+    	 add cx,dx    
     	 	 
     	 mov dx,yDraw
-    	 add dx,ax ; dx = y of pixel for int10h 
+    	 add dx,ax   
     	 
     	 push ax
     	 push bx ; salva i counter
@@ -489,8 +505,8 @@ yMax DW 01DFh ; = 479
 xBall DW 017Fh
 yBall DW 0190h
 ballWidth DW 0005h
-xDirBall DB 1b
-yDirBall DB 0b 
+xDirBall DB 1b ; 1b = -dir, 0b = +dir
+yDirBall DB 0b ; 1b = -dir, 0b = +dir
 ballColor  DB 1010b  
 
 

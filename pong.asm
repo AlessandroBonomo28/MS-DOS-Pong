@@ -19,7 +19,6 @@ org 100h
         ;mov byte ptr [bx], 50
         ;call WriteChar
         
-        
 loop:   NOP
 
         LEA bx,xDraw
@@ -43,6 +42,55 @@ loop:   NOP
         
         call DrawRect ; draw ball
         
+        ;------------------------------
+        
+        LEA bx,xDraw
+        mov ax,xOffPlayer
+        mov word ptr [bx], ax ; set xDraw = xOffPlayer
+        
+        LEA bx,yDraw 
+        mov ax,yPlayer1
+        mov word ptr [bx], ax ; set yDraw = yPlayer1
+        
+        LEA bx,widthDraw
+        mov ax,widthPlayer
+        mov word ptr [bx], ax  ; set widthDraw = widthPlayer
+        
+        LEA bx,heightDraw
+        mov ax,heightPlayer     
+        mov word ptr [bx], ax  ; set heightDraw = heightPlayer
+        
+        LEA bx,colorDraw   
+        mov al,colorPlayer
+        mov byte ptr [bx], al  ; set colorDraw = colorPlayer
+        
+        call DrawRect ; draw player 1
+        
+        ;------------------------------
+        
+        LEA bx,xDraw
+        mov ax,xMax
+        sub ax,xOffPlayer
+        mov word ptr [bx], ax ; set xDraw = xMax - xOffPlayer
+        
+        LEA bx,yDraw 
+        mov ax,yPlayer2
+        mov word ptr [bx], ax ; set yDraw = yPlayer2
+        
+        LEA bx,widthDraw
+        mov ax,widthPlayer
+        mov word ptr [bx], ax  ; set widthDraw = widthBall
+        
+        LEA bx,heightDraw
+        mov ax,heightPlayer     
+        mov word ptr [bx], ax  ; set heightDraw = widthBall
+        
+        LEA bx,colorDraw   
+        mov al,colorPlayer
+        mov byte ptr [bx], al  ; set colorDraw = colorBall
+        
+        call DrawRect ; draw player 2
+        
         
         ;MOV CX, 0001h
         ;MOV DX, 86A0h ;100ms 
@@ -55,7 +103,7 @@ loop:   NOP
         
         mov ah,0
         mov al,12h
-        int 10h  ;clr screen
+        int 10h  ;clear screen
         
         ;LEA bx,colorDraw   
         ;mov byte ptr [bx], 0000b ; set colorDraw = black
@@ -191,8 +239,90 @@ endinc2:
         INT 16H  ; interrupt check input
         
         ; al contains keypressed
+        jne press 
+        jmp nokeys  
         
-        jne endprogram  ; esci se ricevi input (ZF=0)
+press:  cmp al,77h ; w press
+        je wpress
+        jmp next1 
+        
+wpress: mov dx,yPlayer1
+        push dx
+        
+        add dx,heightPlayer
+        mov cx,yMax
+        cmp dx,cx
+        jae flush
+        
+        pop dx
+        inc dx
+        
+        LEA bx,yPlayer1
+        mov word ptr [bx], dx
+next1:  
+
+        cmp al,73h ; s press
+        je spress
+        jmp next2 
+        
+spress: mov dx,yPlayer1
+        
+        cmp dx,0000h
+        je flush
+        
+        sub dx,0001h
+        
+        LEA bx,yPlayer1
+        mov word ptr [bx], dx
+next2:  
+
+;------------
+
+        cmp al,69h ; i press
+        je ipress
+        jmp next3 
+        
+ipress: mov dx,yPlayer2
+        push dx
+        
+        add dx,heightPlayer
+        mov cx,yMax
+        cmp dx,cx
+        jae flush
+        
+        pop dx
+        inc dx
+        
+        LEA bx,yPlayer2
+        mov word ptr [bx], dx
+next3:  
+
+        cmp al,6Bh ; k press
+        je kpress
+        jmp next4 
+        
+kpress: mov dx,yPlayer2
+        
+        cmp dx,0000h
+        je flush
+        
+        sub dx,0001h
+        
+        LEA bx,yPlayer2
+        mov word ptr [bx], dx
+next4:
+
+;-----------
+        cmp al,71h ; q press ends program
+        je endprogram 
+        
+flush:  mov ah,0ch
+        mov al,0
+        int 21h ; flush buffer
+        
+nokeys:
+        
+        ;jne endprogram  ; esci se ricevi input (ZF=0)
         jmp loop
 endprogram:   
 
@@ -212,7 +342,7 @@ colorDraw DB 1100b
 
               
 DrawRect PROC 
-              
+         
          mov ax,0 ; init counter primo for 
 loop1:   mov cx,0 ; init counter for annidato
 
@@ -294,5 +424,14 @@ xDirBall DB 0b
 yDirBall DB 1b 
 ballColor  DB 1010b  
 
+
+yPlayer1 DW 00BEh
+yPlayer2 DW 00BEh
+
+widthPlayer DW 0002h
+heightPlayer DW 0064h
+xOffPlayer DW 000Ah
+yOffPlayer DW 00BEh
+colorPlayer  DB 1100b 
 
 END

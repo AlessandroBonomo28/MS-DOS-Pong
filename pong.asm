@@ -199,7 +199,21 @@ org 100h
         HowToPlay
         
         
-loop:   LEA bx,xDraw
+loop:   
+        
+        MOV AH,2Ch
+		INT 21h    	; get sys time		
+		
+		CMP DL,curTime  	
+		JE loop   
+        
+        MOV curTime,DL    ;update time
+        
+        mov ah,0
+        mov al,12h
+        int 10h  ;clr screen
+
+        LEA bx,xDraw
         mov ax,xBall
         mov word ptr [bx], ax ; set xDraw = xBall
         
@@ -269,9 +283,9 @@ loop:   LEA bx,xDraw
         
         call DrawRect ; draw player 2
         
-        mov ah,0
-        mov al,12h
-        int 10h  ;clear screen
+        ;mov ah,0
+        ;mov al,12h
+        ;int 10h  ;clear screen
         
         ;----------------------------
         
@@ -705,8 +719,10 @@ yPlayer2 DW 00BEh
 
 widthPlayer DW 0002h
 heightPlayer DW 0064h
-xOffPlayer DW 000Ah
+xOffPlayer DW 00010h
 yOffPlayer DW 00BEh
 colorPlayer  DB 1100b 
+
+curTime DB 00h 
 
 END

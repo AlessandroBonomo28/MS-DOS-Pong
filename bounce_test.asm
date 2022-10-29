@@ -3,24 +3,27 @@
 ; 12h  12h = G  80x30	 8x16  640x480	 16/256K  .   A000 VGA,ATI VIP
 ; MS DOS usa 12h resolution
 
-CreateWindow MACRO 
-                 
-    MOV AL, 12h   
-    MOV AH, 0
-    int 10h 
-    
-ENDM
 
 org 100h
 
-        CreateWindow
+        MOV AL, 12h   
+        MOV AH, 0
+        int 10h ; set video mode
         
-        ;LEA bx,charToWrite   
-        ;mov byte ptr [bx], 50
-        ;call WriteChar
+loop:   
+        call SetStep
         
+        MOV AH,2Ch
+		INT 21h    	; get sys time		
+		
+		CMP DL,curTime  	
+		JE loop   
         
-loop:   NOP
+        MOV curTime,DL    ;update time
+        
+        mov ah,0
+        mov al,12h
+        int 10h  ;clr screen
 
         LEA bx,xDraw
         mov ax,xBall
@@ -53,9 +56,9 @@ loop:   NOP
         ;MOV AH, 86h
         ;INT 15h    ;delay  
         
-        mov ah,0
-        mov al,12h
-        int 10h  ;clr screen
+        ;mov ah,0
+        ;mov al,12h
+        ;int 10h  ;clr screen
         
         ;LEA bx,colorDraw   
         ;mov byte ptr [bx], 0000b ; set colorDraw = black
@@ -66,7 +69,7 @@ loop:   NOP
         ;-------------------
         ; START check ball_bottom hit left wall and change xDirBall
         
-        mov ax,xBall
+        mov ax,xBall 
         cmp ax,0000h ; se xBall = 0
         jne cansub1
            
@@ -159,9 +162,9 @@ canadd2: ; xBall > 0, END check wall for xDirBall
         mov bl, xDirBall
         cmp bl,1b ; se xDirBall = -1
         je decr1
-        add ax,0001h  ;incremento
+        add ax,xBallStep  ;incremento
         jmp endinc1 
-decr1:  sub ax,0001h      
+decr1:  sub ax,xBallStep      
 endinc1:        
         
         
@@ -176,9 +179,9 @@ endinc1:
         mov bl, yDirBall
         cmp bl,1b ; se yDirBall = -1
         je decr2
-        add ax,0001h  ;incremento
+        add ax,yBallStep  ;incremento
         jmp endinc2 
-decr2:  sub ax,0001h      
+decr2:  sub ax,yBallStep      
 endinc2:
 
 
@@ -202,6 +205,49 @@ endprogram:
 
      
 RET
+
+
+PROC SetStep 
+    push ax
+    
+    mov ax,xBallStepStd
+    cmp ax,xBall
+    jae set1  
+    
+    mov ax,yBallStepStd
+    cmp ax,yBall
+    jae set1
+    
+    mov ax,xMax
+    sub ax,xBallStepStd
+    sub ax,ballWidth
+    cmp xBall,ax     
+    jae set1
+    
+    mov ax,yMax
+    sub ax,yBallStepStd
+    sub ax,ballWidth
+    cmp yBall,ax
+    jae set1
+    
+    jmp setdef
+set1:mov ax,0001h
+    mov xBallStep,ax
+    mov yBallStep,ax      
+    jmp q1
+setdef:    
+    mov ax,xBallStepStd
+    mov xBallStep,ax  
+    
+    mov ax,yBallStepStd
+    mov yBallStep,ax
+q1: 
+    pop ax
+
+    RET 
+
+ENDP
+
 
 
 xDraw DW 0000h
@@ -277,7 +323,8 @@ WriteChar PROC
     
 RET
 
-ENDP
+ENDP  
+
 
 ; resolution of int 12h is 640x480 
 
@@ -289,10 +336,14 @@ yMax DW 01DFh ; = 479
 
 xBall DW 017Fh
 yBall DW 0190h
-ballWidth DW 0005h
+ballWidth DW 000Ah
 xDirBall DB 0b
 yDirBall DB 1b 
 ballColor  DB 1010b  
-
+xBallStep DW 0008h 
+xBallStepStd DW 0008h
+yBallStep DW 0005h
+yBallStepStd DW 0005h
+curTime DB 0
 
 END

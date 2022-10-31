@@ -156,74 +156,59 @@ loop:
         mov al,12h
         int 10h  ;clr screen
 
-        LEA bx,xDraw
         mov ax,xBall
-        mov word ptr [bx], ax ; set xDraw = xBall
-        
-        LEA bx,yDraw 
+        mov xDraw, ax ; set xDraw = xBall
+         
         mov ax,yBall
-        mov word ptr [bx], ax ; set yDraw = yBall
+        mov yDraw, ax ; set yDraw = yBall
         
-        LEA bx,widthDraw
         mov ax,ballWidth
-        mov word ptr [bx], ax  ; set widthDraw = widthBall
+        mov widthDraw, ax  ; set widthDraw = widthBall
         
-        LEA bx,heightDraw      
-        mov word ptr [bx], ax  ; set heightDraw = widthBall
-        
-        LEA bx,colorDraw   
+        mov heightDraw, ax  ; set heightDraw = widthBall
+         
         mov al,ballColor
-        mov byte ptr [bx], al  ; set colorDraw = colorBall
+        mov colorDraw, al  ; set colorDraw = colorBall
         
         call DrawRect ; draw ball
         
         ;------------------------------
         
-        LEA bx,xDraw
         mov ax,xOffPlayer
-        mov word ptr [bx], ax ; set xDraw = xOffPlayer
+        mov xDraw, ax ; set xDraw = xOffPlayer
         
-        LEA bx,yDraw 
         mov ax,yPlayer1
-        mov word ptr [bx], ax ; set yDraw = yPlayer1
+        mov yDraw, ax ; set yDraw = yPlayer1
         
-        LEA bx,widthDraw
         mov ax,widthPlayer
-        mov word ptr [bx], ax  ; set widthDraw = widthPlayer
+        mov widthDraw, ax  ; set widthDraw = widthPlayer
         
-        LEA bx,heightDraw
         mov ax,heightPlayer     
-        mov word ptr [bx], ax  ; set heightDraw = heightPlayer
+        mov heightDraw, ax  ; set heightDraw = heightPlayer
         
-        LEA bx,colorDraw   
         mov al,colorPlayer
-        mov byte ptr [bx], al  ; set colorDraw = colorPlayer
+        mov colorDraw, al  ; set colorDraw = colorPlayer
         
         call DrawRect ; draw player 1
         
         ;------------------------------
         
-        LEA bx,xDraw
         mov ax,xMax
         sub ax,xOffPlayer
         sub ax,widthPlayer
-        mov word ptr [bx], ax ; set xDraw = xMax - xOffPlayer
+        mov xDraw, ax ; set xDraw = xMax - xOffPlayer
         
-        LEA bx,yDraw 
         mov ax,yPlayer2
-        mov word ptr [bx], ax ; set yDraw = yPlayer2
+        mov yDraw, ax ; set yDraw = yPlayer2
         
-        LEA bx,widthDraw
         mov ax,widthPlayer
-        mov word ptr [bx], ax  ; set widthDraw = widthBall
+        mov widthDraw, ax  ; set widthDraw = widthBall
         
-        LEA bx,heightDraw
         mov ax,heightPlayer     
-        mov word ptr [bx], ax  ; set heightDraw = widthBall
-        
-        LEA bx,colorDraw   
+        mov heightDraw, ax  ; set heightDraw = widthBall
+         
         mov al,colorPlayer
-        mov byte ptr [bx], al  ; set colorDraw = colorBall
+        mov colorDraw, al  ; set colorDraw = colorBall
         
         call DrawRect ; draw player 2
         
@@ -275,8 +260,8 @@ condp1:
         jb hitp1
         jmp cansub1
                    
-hitp1:  LEA bx,xDirBall ; if yPlayer2 + heightPlayer < yBall
-        mov byte ptr [bx], 0b ; set xDirBall = 0 (positive direction)
+hitp1:   
+        mov xDirBall, 0b ; set xDirBall = 0 (positive direction)
         
 cansub1:
         ; ball will not hit left wall and player
@@ -298,8 +283,7 @@ cansub1:
         
         ; caso yDirBall = -1 
                     
-        LEA bx,yDirBall
-        mov byte ptr [bx], 0b ; set yDirBall = 0 (positive direction)
+        mov yDirBall, 0b ; set yDirBall = 0 (positive direction)
         
 cansub2: ; ball will not hit down wall
                             
@@ -354,8 +338,8 @@ condp2:
         jb hitp2
         jmp canadd1
                    
-hitp2:  LEA bx,xDirBall
-        mov byte ptr [bx], 1b ; set xDirBall = 1 (negative direction) 
+hitp2:  
+        mov xDirBall, 1b ; set xDirBall = 1 (negative direction) 
         
 canadd1: ; ball will not touch right wall and player2
                    
@@ -376,8 +360,7 @@ canadd1: ; ball will not touch right wall and player2
         
         ; caso yDirBall = 1 
                     
-        LEA bx,yDirBall
-        mov byte ptr [bx], 1b ; set yDirBall = 1 (negative direction) 
+        mov yDirBall, 1b ; set yDirBall = 1 (negative direction) 
         
 canadd2: ; ball will not hit top wall
                    
@@ -484,69 +467,49 @@ nokeys:
         
         jmp loop
 
-p1loss: 
-        LEA bx,charColor   
-        mov byte ptr [bx], 0001b
-        
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 80 ;P
-        LEA bx,xChar   
-        mov byte ptr [bx], 0Ah ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 05 ;y
+p1loss:   
+        mov charColor, 0001b
+          
+        mov charToWrite, 80 ;P 
+        mov xChar, 0Ah ;x  
+        mov yChar, 05 ;y
         call WriteChar
-        
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 49 ;1 
-        LEA bx,xChar   
-        mov byte ptr [bx], 0Bh ;x
+          
+        mov charToWrite, 49 ;1   
+        mov xChar, 0Bh ;x
         call WriteChar
         
         jmp msg
 p2loss: 
-
-        LEA bx,charColor   
-        mov byte ptr [bx], 0001b
-        
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 80 ;P
-        LEA bx,xChar   
-        mov byte ptr [bx], 0Ah ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 05 ;y
+ 
+        mov charColor, 0001b
+         
+        mov charToWrite, 80 ;P   
+        mov xChar, 0Ah ;x 
+        mov yChar, 05 ;y
         call WriteChar
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 50 ;2 
-        LEA bx,xChar   
-        mov byte ptr [bx], 0Bh ;x
+        mov charToWrite, 50 ;2 
+        mov xChar, 0Bh ;x
         call WriteChar
                
-msg:    LEA bx,charColor   
-        mov byte ptr [bx], 1100b 
-        
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 76 ;L 
-        LEA bx,xChar   
-        mov byte ptr [bx], 0Dh ;x
+msg:     
+        mov charColor, 1100b 
+          
+        mov charToWrite, 76 ;L   
+        mov xChar, 0Dh ;x
         call WriteChar
-        
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 79 ;O 
-        LEA bx,xChar   
-        mov byte ptr [bx], 0Eh ;x
+         
+        mov charToWrite, 79 ;O   
+        mov xChar, 0Eh ;x
         call WriteChar 
-        
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 83 ;S 
-        LEA bx,xChar   
-        mov byte ptr [bx], 0Fh ;x
+           
+        mov charToWrite, 83 ;S   
+        mov xChar, 0Fh ;x
         call WriteChar
-        
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 83 ;S 
-        LEA bx,xChar   
-        mov byte ptr [bx], 10h ;x
+           
+        mov charToWrite, 83 ;S   
+        mov xChar, 10h ;x
         call WriteChar
         
         MOV CX,001Eh
@@ -711,9 +674,7 @@ L4:     ; in bound top wall
 decr1:  sub ax,ballStep      
 endinc1:        
         
-        
-        LEA bx,xBall
-        mov word ptr [bx], ax 
+        mov xBall, ax 
         
         ; update yBall
         
@@ -728,9 +689,7 @@ endinc1:
 decr2:  sub ax,ballStep      
 endinc2:
 
-
-        LEA bx,yBall
-        mov word ptr [bx], ax 
+        mov yBall, ax 
         
     
 updated:RET

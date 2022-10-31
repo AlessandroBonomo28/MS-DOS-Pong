@@ -1,164 +1,108 @@
 MACRO HowToPlay
         mov charColor, 0001b
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 80 ;P
-        LEA bx,xChar   
-        mov byte ptr [bx], 05h ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 05h ;y
+        mov charToWrite , 80 ;P
+        mov xChar, 05h ;x
+        mov yChar, 05h ;y
         call WriteChar
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 49 ;1 
-        LEA bx,xChar   
-        mov byte ptr [bx], 06h ;x
+        mov charToWrite, 49 ;1 
+        mov xChar, 06h ;x
         call WriteChar
          
-        LEA bx,charColor   
-        mov byte ptr [bx], 1111b
+        mov charColor, 1111b
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 24d ; freccia su
-        LEA bx,xChar   
-        mov byte ptr [bx], 0Ah ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 05h ;y
+        mov charToWrite, 24d ; freccia su
+        mov xChar, 0Ah ;x
+        mov yChar, 05h ;y
         call WriteChar    
         
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 87d ; W
-        LEA bx,xChar   
-        mov byte ptr [bx], 0Ch ;x
-        LEA bx,yChar         
-        mov byte ptr [bx], 05h ;y
+        mov charToWrite, 87d ; W
+        mov xChar, 0Ch ;x
+        mov yChar, 05h ;y
         call WriteChar   
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 25d ; freccia giu
-        LEA bx,xChar   
-        mov byte ptr [bx], 0Ah ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 08h ;y
+        mov charToWrite, 25d ; freccia giu
+        mov xChar, 0Ah ;x
+        mov yChar, 08h ;y
         call WriteChar    
         
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 83d ; S
-        LEA bx,xChar   
-        mov byte ptr [bx], 0Ch ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 08h ;y
+        mov charToWrite, 83d ; S
+        mov xChar, 0Ch ;x
+        mov yChar, 08h ;y
         call WriteChar  
         
         ;----
         
-        LEA bx,charColor   
-        mov byte ptr [bx], 0001b
+        mov charColor, 0001b
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 80 ;P
-        LEA bx,xChar   
-        mov byte ptr [bx], 15h ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 05h ;y
+        mov charToWrite, 80 ;P
+        mov xChar, 15h ;x
+        mov yChar, 05h ;y
         call WriteChar
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 50 ;2 
-        LEA bx,xChar   
-        mov byte ptr [bx], 16h ;x
+        mov charToWrite, 50 ;2 
+        mov xChar, 16h ;x
         call WriteChar
          
-        LEA bx,charColor   
-        mov byte ptr [bx], 1111b
+        mov charColor, 1111b
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 24d ; freccia su
-        LEA bx,xChar   
-        mov byte ptr [bx], 1Ah ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 05h ;y
+        mov charToWrite, 24d ; freccia su
+        mov xChar, 1Ah ;x
+        mov yChar, 05h ;y
         call WriteChar    
         
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 73d ; I
-        LEA bx,xChar   
-        mov byte ptr [bx], 1Ch ;x
-        LEA bx,yChar         
-        mov byte ptr [bx], 05h ;y
+        mov charToWrite, 73d ; I
+        mov xChar, 1Ch ;x
+        mov yChar, 05h ;y
         call WriteChar   
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 25d ; freccia giu
-        LEA bx,xChar   
-        mov byte ptr [bx], 1Ah ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 08h ;y
+        mov charToWrite, 25d ; freccia giu
+        mov xChar, 1Ah ;x
+        mov yChar, 08h ;y
         call WriteChar    
         
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 75d ; K
-        LEA bx,xChar   
-        mov byte ptr [bx], 1Ch ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 08h ;y
+        mov charToWrite, 75d ; K
+        mov xChar, 1Ch ;x
+        mov yChar, 08h ;y
         call WriteChar
         
         ;----
         
-        LEA bx,charColor   
-        mov byte ptr [bx], 1100b
+        mov charColor, 1100b
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 83d ;s
-        LEA bx,xChar   
-        mov byte ptr [bx], 05h ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 0Fh ;y
+        mov charToWrite, 83d ;s
+        mov xChar, 05h ;x
+        mov yChar, 0Fh ;y
         call WriteChar
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 84d ;t
-        LEA bx,xChar   
-        mov byte ptr [bx], 06h ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 0Fh ;y
+        mov charToWrite, 84d ;t
+        mov xChar, 06h ;x
+        mov yChar, 0Fh ;y
         call WriteChar
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 65d ;a
-        LEA bx,xChar   
-        mov byte ptr [bx], 07h ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 0Fh ;y
+        mov charToWrite, 65d ;a
+        mov xChar, 07h ;x
+        mov yChar, 0Fh ;y
         call WriteChar
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 82d ;r
-        LEA bx,xChar   
-        mov byte ptr [bx], 08h ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 0Fh ;y
+        mov charToWrite, 82d ;r
+        mov xChar, 08h ;x
+        mov yChar, 0Fh ;y
         call WriteChar
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 84d ;t
-        LEA bx,xChar   
-        mov byte ptr [bx], 09h ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 0Fh ;y
+        mov charToWrite, 84d ;t
+        mov xChar, 09h ;x
+        mov yChar, 0Fh ;y
         call WriteChar 
         
-        LEA bx,charToWrite   
-        mov byte ptr [bx], 16d ;play
-        LEA bx,xChar   
-        mov byte ptr [bx], 0Bh ;x
-        LEA bx,yChar   
-        mov byte ptr [bx], 0Fh ;y
+        mov charToWrite, 16d ;play
+        mov xChar, 0Bh ;x
+        mov yChar, 0Fh ;y
         call WriteChar   
         
 loop0:    

@@ -1,6 +1,5 @@
 MACRO HowToPlay
-        LEA bx,charColor   
-        mov byte ptr [bx], 0001b
+        mov charColor, 0001b
         
         LEA bx,charToWrite   
         mov byte ptr [bx], 80 ;P
@@ -263,6 +262,7 @@ loop:
         LEA bx,xDraw
         mov ax,xMax
         sub ax,xOffPlayer
+        sub ax,widthPlayer
         mov word ptr [bx], ax ; set xDraw = xMax - xOffPlayer
         
         LEA bx,yDraw 
@@ -297,11 +297,18 @@ loop:
         
         ; xBall is 0 
         
+        mov dx, xOffPlayer
+        cmp ax,dx ; if xBall < xOffPlayer
+        jb cansub1
+        
         mov dx,xOffPlayer
         add dx,widthPlayer
+        ;add dx,ballStep
         
-        cmp ax,dx ; if xBall = xOffPlayer+widthPlayer
-        jne cansub1
+        cmp ax,dx ; if xBall >= xOffPlayer+widthPlayer+ stepBall
+        jae cansub1 
+        
+        
            
         ; xBall = xOffPlayer+widthPlayer
         
@@ -316,10 +323,10 @@ loop:
         cmp cx,dx; if xBall >= yPlayer1
         jae condp1
         jmp cansub1
-condp1:  
+condp1: 
         mov bx,heightPlayer
         
-        add dx,bx
+        add dx,bx ; dx = yPlayer1 + heightPlayer
         cmp cx,dx
         jb hitp1
         jmp cansub1
@@ -369,8 +376,17 @@ cansub2: ; ball will not hit down wall
         add ax,bx 
         mov cx,xMax
         sub cx,xOffPlayer
-        cmp ax,cx ; if xBall+ballWidth = xMax - xOffPlayer
-        jne canadd1
+        cmp ax,cx ; if xBall+ballWidth > xMax - xOffPlayer
+        ja canadd1
+        
+        mov ax,xBall
+        mov bx,ballWidth
+        add ax,bx 
+        mov cx,xMax
+        sub cx,xOffPlayer  
+        sub cx,widthPlayer
+        cmp ax,cx ; if xBall+ballWidth < xMax - xOffPlayer - widthPlayer
+        jb canadd1
                            
         ; xBall+ballWidth = xMax - xOffPlayer
         
@@ -423,39 +439,7 @@ canadd2: ; ball will not hit top wall
                    
         ;-------------------
         
-        ; update xBall
-           
-        
-        mov ax,xBall
-        
-        mov bl, xDirBall
-        cmp bl,1b
-        je decr1
-        add ax,0001h  
-        jmp endinc1 
-decr1:  sub ax,0001h      
-endinc1:        
-        
-        
-        LEA bx,xBall
-        mov word ptr [bx], ax 
-        
-        ; update yBall
-        
-        
-        mov ax,yBall
-        
-        mov bl, yDirBall
-        cmp bl,1b
-        je decr2
-        add ax,0001h  
-        jmp endinc2 
-decr2:  sub ax,0001h      
-endinc2:
-
-
-        LEA bx,yBall
-        mov word ptr [bx], ax 
+        call UpdateBall 
         
                  
            
@@ -470,34 +454,38 @@ press:  cmp al,73h ; s pressed
         je dwnkey1
         jmp next1 
         
-dwnkey1:mov dx,yPlayer1
-        push dx
-        
+dwnkey1:  
+      
+        mov dx,yPlayer1
         add dx,heightPlayer
-        mov cx,yMax
-        cmp dx,cx
-        jae flush
-        
-        pop dx
-        inc dx
-        
-        LEA bx,yPlayer1
-        mov word ptr [bx], dx
+        mov bx,yMax
+        sub bx,playerStep
+        cmp dx,bx ; se al prossimo step esci dal muro top
+        jb incyp1 
+        ; caso esci dal muro  
+        mov bx,yMax
+        sub bx,heightPlayer
+        mov yPlayer1,bx 
+        jmp flush      
+incyp1: mov bx,yPlayer1
+        add bx,playerStep
+        mov yPlayer1,bx        
 next1:  
 
         cmp al,77h ; w pressed
         je upkey1
         jmp next2 
         
-upkey1: mov dx,yPlayer1
+upkey1: 
+        mov dx,playerStep
+        cmp dx,yPlayer1 ; se esci dal muro bottom
+        jb subyp1
+        mov yPlayer1, 0000h
+        jmp flush
         
-        cmp dx,0000h
-        je flush
-        
-        sub dx,0001h
-        
-        LEA bx,yPlayer1
-        mov word ptr [bx], dx
+subyp1: mov dx,yPlayer1
+        sub dx,playerStep
+        mov yPlayer1,dx
 next2:  
 
 ;------------
@@ -506,34 +494,38 @@ next2:
         je dwnkey2
         jmp next3 
         
-dwnkey2:mov dx,yPlayer2
+dwnkey2:
         
-        
+        mov dx,yPlayer2
         add dx,heightPlayer
-        mov cx,yMax
-        cmp dx,cx
-        jae flush
-        
-        mov dx, yPlayer2
-        inc dx
-        
-        LEA bx,yPlayer2
-        mov word ptr [bx], dx
+        mov bx,yMax
+        sub bx,playerStep
+        cmp dx,bx ; se al prossimo step esci dal muro top
+        jb incyp2 
+        ; caso esci dal muro  
+        mov bx,yMax
+        sub bx,heightPlayer
+        mov yPlayer2,bx 
+        jmp flush      
+incyp2: mov bx,yPlayer2
+        add bx,playerStep
+        mov yPlayer2,bx
 next3:  
 
         cmp al,69h ; i pressed
         je upkey2
         jmp next4 
         
-upkey2: mov dx,yPlayer2
+upkey2:
+        mov dx,playerStep
+        cmp dx,yPlayer2 ; se esci dal muro bottom
+        jb subyp2
+        mov yPlayer2, 0000h
+        jmp flush
         
-        cmp dx,0000h
-        je flush
-        
-        sub dx,0001h
-        
-        LEA bx,yPlayer2
-        mov word ptr [bx], dx
+subyp2: mov dx,yPlayer2
+        sub dx,playerStep
+        mov yPlayer2,dx
 next4:
 
 ;-----------
@@ -696,6 +688,108 @@ WriteChar PROC
     
 RET
 
+ENDP 
+
+PROC UpdateBall  
+    
+        mov ax,ballStep
+        cmp ax,xBall ; se dista uno step da left wall
+        jb L1
+        mov al,xDirBall
+        cmp al,1b    ; se la direzione x = -1
+        jne L1
+        
+        mov xBall,0000h
+        jmp updated
+    
+L1:     ; in bound left wall
+        
+        mov ax,ballStep
+        cmp ax,yBall
+        jb L2 
+        mov al,yDirBall
+        cmp al,1b     ; se la direzione y = -1
+        jne L2
+        mov yBall,0000h
+        jmp updated
+L2:     ; in bound bottom wall
+
+        
+        mov ax,xBall
+        add ax,ballWidth
+        
+        mov bx,xMax
+        sub bx,ballStep
+        
+        cmp ax,bx
+        jb L3     
+        
+        mov al,xDirBall
+        cmp al,0b
+        jne L3
+        
+        mov ax,xMax
+        sub ax,ballWidth
+        mov xBall,ax
+        jmp updated
+L3:     ; in bound right wall
+
+        mov ax,yBall
+        add ax,ballWidth
+        
+        mov bx,yMax
+        sub bx,ballStep
+        
+        cmp ax,bx
+        jb L4     
+        
+        mov al,yDirBall
+        cmp al,0b
+        jne L4
+        
+        mov ax,yMax
+        sub ax,ballWidth
+        mov yBall,ax
+        jmp updated
+L4:     ; in bound top wall
+        
+        
+     ; update xBall
+           
+        
+        mov ax,xBall
+        
+        mov bl, xDirBall
+        cmp bl,1b
+        je decr1
+        add ax,ballStep  
+        jmp endinc1 
+decr1:  sub ax,ballStep      
+endinc1:        
+        
+        
+        LEA bx,xBall
+        mov word ptr [bx], ax 
+        
+        ; update yBall
+        
+        
+        mov ax,yBall
+        
+        mov bl, yDirBall
+        cmp bl,1b
+        je decr2
+        add ax,ballStep  
+        jmp endinc2 
+decr2:  sub ax,ballStep      
+endinc2:
+
+
+        LEA bx,yBall
+        mov word ptr [bx], ax 
+        
+    
+updated:RET
 ENDP
 
 ; resolution of int 12h is 640x480 
@@ -706,22 +800,25 @@ ENDP
 xMax DW 027Fh ; = 639
 yMax DW 01DFh ; = 479 
 
-xBall DW 017Fh
+xBall DW 01F4h
 yBall DW 0190h
-ballWidth DW 0005h
+ballWidth DW 0006h
 xDirBall DB 1b ; 1b = -dir, 0b = +dir
 yDirBall DB 0b ; 1b = -dir, 0b = +dir
-ballColor  DB 1010b  
-
+ballColor  DB 1010b
+  
+ballStep DW 0006h
 
 yPlayer1 DW 00BEh
 yPlayer2 DW 00BEh
 
-widthPlayer DW 0002h
+widthPlayer DW 0006h ; deve essere >= ballStep
 heightPlayer DW 0064h
-xOffPlayer DW 00010h
+xOffPlayer DW 00012h
 yOffPlayer DW 00BEh
 colorPlayer  DB 1100b 
+
+playerStep DW 000Ah
 
 curTime DB 00h 
 

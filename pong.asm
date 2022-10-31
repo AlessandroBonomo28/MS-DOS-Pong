@@ -75,32 +75,47 @@ MACRO HowToPlay
         
         mov charColor, 1100b
         
-        mov charToWrite, 83d ;s
-        mov xChar, 05h ;x
+        mov charToWrite, 72d ;h
+        mov xChar, 01h ;x
+        mov yChar, 0Fh ;y
+        call WriteChar
+        
+        mov charToWrite, 73d ;i
+        mov xChar, 02h ;x
         mov yChar, 0Fh ;y
         call WriteChar
         
         mov charToWrite, 84d ;t
-        mov xChar, 06h ;x
+        mov xChar, 03h ;x
         mov yChar, 0Fh ;y
         call WriteChar
         
         mov charToWrite, 65d ;a
+        mov xChar, 05h ;x
+        mov yChar, 0Fh ;y
+        call WriteChar
+        
+        mov charToWrite, 78d ;n
+        mov xChar, 06h ;x
+        mov yChar, 0Fh ;y
+        call WriteChar
+        
+        mov charToWrite, 89d ;y
         mov xChar, 07h ;x
         mov yChar, 0Fh ;y
         call WriteChar
         
-        mov charToWrite, 82d ;r
-        mov xChar, 08h ;x
+        mov charToWrite, 75d ;y
+        mov xChar, 09h ;x
         mov yChar, 0Fh ;y
         call WriteChar
         
-        mov charToWrite, 84d ;t
-        mov xChar, 09h ;x
+        mov charToWrite, 69d ;e
+        mov xChar, 0Ah ;x
         mov yChar, 0Fh ;y
         call WriteChar 
         
-        mov charToWrite, 16d ;play
+        mov charToWrite, 89d ;y
         mov xChar, 0Bh ;x
         mov yChar, 0Fh ;y
         call WriteChar   
@@ -131,7 +146,6 @@ int 10h  ;clear screen
 ENDM
 
 org 100h
-
         MOV AL, 12h   
         MOV AH, 0
         int 10h  ; set MSDOS compatible video mode
@@ -152,10 +166,28 @@ loop:
         
         MOV curTime,DL    ;update time
         
-        mov ah,0
-        mov al,12h
-        int 10h  ;clr screen
-
+        ;mov ah,0
+        ;mov al,12h
+        ;int 10h  ;clr screen
+        ;------------------------
+        mov ax,xBallold
+        mov xDraw, ax ; set xDraw = xBall
+         
+        mov ax,yBallold
+        mov yDraw, ax ; set yDraw = yBall
+        
+        mov ax,ballWidth
+        mov widthDraw, ax  ; set widthDraw = widthBall
+        
+        mov heightDraw, ax  ; set heightDraw = widthBall
+         
+        
+        mov colorDraw, 0000b  ; set colorDraw = colorBall
+        
+        call DrawRect ; delete old ball
+        
+        ;--------------------------
+        
         mov ax,xBall
         mov xDraw, ax ; set xDraw = xBall
          
@@ -172,8 +204,38 @@ loop:
         
         call DrawRect ; draw ball
         
-        ;------------------------------
+        ;------------------------------ 
         
+        mov ax,xBall
+        mov bx,xOffPlayer
+        add bx,widthPlayer
+        add bx,ballStep
+        cmp ax,bx
+        jb drawp1   ; se ball vicino a p1 disegna p1
+        
+        mov ax,yPlayer1
+        cmp ax,yPlayer1old
+        je nodrawp1
+drawp1:        
+        
+        mov ax,xOffPlayer
+        mov xDraw, ax ; set xDraw = xOffPlayer
+        
+        mov ax,yPlayer1old
+        mov yDraw, ax ; set yDraw = yPlayer1
+        
+        mov ax,widthPlayer
+        mov widthDraw, ax  ; set widthDraw = widthPlayer
+        
+        mov ax,heightPlayer     
+        mov heightDraw, ax  ; set heightDraw = heightPlayer
+        
+        mov colorDraw, 0000b  ; set colorDraw = colorPlayer
+        
+        call DrawRect ; delete player 1
+        
+        
+        ;------------------------------
         mov ax,xOffPlayer
         mov xDraw, ax ; set xDraw = xOffPlayer
         
@@ -192,7 +254,40 @@ loop:
         call DrawRect ; draw player 1
         
         ;------------------------------
+nodrawp1:
         
+        mov ax,xMax
+        mov bx,xOffPlayer
+        add bx,widthPlayer
+        add bx,ballStep 
+        add bx,ballWidth
+        sub ax,bx
+        cmp xBall,ax
+        jae drawp2   ; se ball vicino a p2 disegna p2
+        
+        mov ax,yPlayer2
+        cmp ax,yPlayer2old
+        je nodrawp2
+drawp2:        
+        mov ax,xMax
+        sub ax,xOffPlayer
+        sub ax,widthPlayer
+        mov xDraw, ax ; set xDraw = xMax - xOffPlayer
+        
+        mov ax,yPlayer2old
+        mov yDraw, ax ; set yDraw = yPlayer2
+        
+        mov ax,widthPlayer
+        mov widthDraw, ax  ; set widthDraw = widthBall
+        
+        mov ax,heightPlayer     
+        mov heightDraw, ax  ; set heightDraw = widthBall
+         
+        mov colorDraw, 0000b  ; set colorDraw = colorBall
+        
+        call DrawRect ; delete player 2
+        
+        ;------------------------------
         mov ax,xMax
         sub ax,xOffPlayer
         sub ax,widthPlayer
@@ -211,10 +306,7 @@ loop:
         mov colorDraw, al  ; set colorDraw = colorBall
         
         call DrawRect ; draw player 2
-        
-        ;mov ah,0
-        ;mov al,12h
-        ;int 10h  ;clear screen
+nodrawp2:        
         
         ;----------------------------
         
@@ -260,7 +352,7 @@ condp1:
         jb hitp1
         jmp cansub1
                    
-hitp1:   
+hitp1:  call Beep 
         mov xDirBall, 0b ; set xDirBall = 0 (positive direction)
         
 cansub1:
@@ -282,7 +374,7 @@ cansub1:
         jne cansub2  
         
         ; caso yDirBall = -1 
-                    
+        call Beep            
         mov yDirBall, 0b ; set yDirBall = 0 (positive direction)
         
 cansub2: ; ball will not hit down wall
@@ -339,6 +431,7 @@ condp2:
         jmp canadd1
                    
 hitp2:  
+        call Beep
         mov xDirBall, 1b ; set xDirBall = 1 (negative direction) 
         
 canadd1: ; ball will not touch right wall and player2
@@ -359,12 +452,21 @@ canadd1: ; ball will not touch right wall and player2
         jne canadd2                      
         
         ; caso yDirBall = 1 
-                    
+        call Beep            
         mov yDirBall, 1b ; set yDirBall = 1 (negative direction) 
         
 canadd2: ; ball will not hit top wall
                    
-        ;-------------------
+        ;-------------------  
+        mov dx,xBall
+        mov xBallold,dx
+        mov dx,yBall
+        mov yBallold,dx
+        
+        mov dx,yPlayer1
+        mov yPlayer1old,dx
+        mov dx,yPlayer2
+        mov yPlayer2old,dx
         
         call UpdateBall 
         
@@ -377,7 +479,10 @@ canadd2: ; ball will not hit top wall
         jne press 
         jmp nokeys  
         
-press:  cmp al,73h ; s pressed
+press:  
+        
+        
+        cmp al,73h ; s pressed
         je dwnkey1
         jmp next1 
         
@@ -459,9 +564,12 @@ next4:
         cmp al,71h ; q press ends program
         je endprogram 
         
-flush:  mov ah,0ch
-        mov al,0
-        int 21h ; flush buffer
+flush:  
+         xor ah, ah
+         int 16h ; flush buffer
+        ;mov ah,0ch
+        ;mov al,0
+        ;int 21h ; flush buffer
         
 nokeys:
         
@@ -693,6 +801,15 @@ endinc2:
         
     
 updated:RET
+ENDP  
+
+PROC Beep
+    xor ax,ax  
+    xor dx,dx 
+    mov ah,2
+    mov dl,7
+    int 21h
+    RET
 ENDP
 
 ; resolution of int 12h is 640x480 
@@ -704,7 +821,11 @@ xMax DW 027Fh ; = 639
 yMax DW 01DFh ; = 479 
 
 xBall DW 01F4h
-yBall DW 0190h
+yBall DW 0190h 
+
+xBallold DW 01F4h
+yBallold DW 0190h
+
 ballWidth DW 0006h
 xDirBall DB 1b ; 1b = -dir, 0b = +dir
 yDirBall DB 0b ; 1b = -dir, 0b = +dir
@@ -714,6 +835,9 @@ ballStep DW 0006h
 
 yPlayer1 DW 00BEh
 yPlayer2 DW 00BEh
+
+yPlayer1old DW 00B0h
+yPlayer2old DW 00B0h
 
 widthPlayer DW 0006h ; deve essere >= ballStep
 heightPlayer DW 0064h

@@ -120,7 +120,7 @@ MACRO HowToPlay
         mov yChar, 0Fh ;y
         call WriteChar   
         
-loop0:    
+loop0:   
         MOV AH,01h
         INT 16H  ; interrupt check input
         
@@ -146,6 +146,7 @@ int 10h  ;clear screen
 ENDM
 
 org 100h
+        call Beep
         MOV AL, 12h   
         MOV AH, 0
         int 10h  ; set MSDOS compatible video mode

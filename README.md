@@ -6,7 +6,7 @@ Pong written in assembly language for processor architecture 8086
 3) Load floppy1 into the MSDOS virtual machine.
 4) Enter 'A:' to mount the floppy
 5) Enter 'pong' to execute the .com file
-# How to compile your own assembly program and run it on MS-DOS
+# How to compile your own assembly program and run them on MS-DOS
 1) Clone git repository
 2) Setup MS-DOS https://github.com/AlessandroBonomo28/MSDOS-setup
 3) Install emu8086 to compile your assembly program into a .com executable https://github.com/AlessandroBonomo28/emu8086

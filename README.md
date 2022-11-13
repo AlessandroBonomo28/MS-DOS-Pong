@@ -2,7 +2,7 @@
 Pong written in assembly language for processor architecture 8086 
 # How to play
 1) Clone git repository
-2) Setup MS-DOS https://github.com/AlessandroBonomo28/MSDOS-setup
+2) Setup MS-DOS https://github.com/AlessandroBonomo28/MS-DOS-setup
 3) Load floppy1 into the MS-DOS virtual machine.
 4) Enter 'A:' to mount the floppy
 5) Enter 'pong' to execute the .com file

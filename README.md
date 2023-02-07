@@ -1,5 +1,6 @@
 # MS-DOS Pong
-Pong written in assembly language for processor architecture 8086 
+Pong written in assembly language for processor architecture 8086 <br>
+
 # How to play
 1) Clone git repository
 2) Setup MS-DOS https://github.com/AlessandroBonomo28/MS-DOS-setup
@@ -18,3 +19,8 @@ Pong written in assembly language for processor architecture 8086
 8) Mount the floppy with 'A:'
 9) Enter 'dir' to check the content of the floppy
 10) Enter the name of your .com file and MS-DOS will execute it
+
+## Screenshots
+![pong2](https://user-images.githubusercontent.com/75626033/217205357-4bc75dba-ef0b-437b-a428-29d2d7d8b4aa.PNG)
+![pong3](https://user-images.githubusercontent.com/75626033/217205361-45b61e5e-bd35-4520-b32a-82e36ba539a9.PNG)
+![pong4](https://user-images.githubusercontent.com/75626033/217205365-3040fbf4-1eaf-4c03-a421-c2d2e038e78c.PNG)

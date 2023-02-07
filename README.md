@@ -1,6 +1,7 @@
 # MS-DOS Pong
 Pong written in assembly language for processor architecture 8086 <br>
-Click [here](https://www.youtube.com/watch?v=Rijj1_BilIo&t=119s&ab_channel=Idostuff) to see the demo on YouTube.
+- Click [here](https://www.youtube.com/watch?v=Rijj1_BilIo&t=119s&ab_channel=Idostuff) to see the demo on YouTube.
+
 # How to play
 1) Clone git repository
 2) Setup MS-DOS https://github.com/AlessandroBonomo28/MS-DOS-setup

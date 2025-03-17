@@ -3,11 +3,7 @@ Pong written in assembly language for processor architecture 8086 <br>
 - Click [here](https://www.youtube.com/watch?v=Rijj1_BilIo&t=119s&ab_channel=Idostuff) to see the demo on YouTube.
 
 I have developed the well-known video game Pong using assembly language and played it on MS-DOS in a virtual machine. To develop the game, I utilized emu8086 as the development environment. After extensively testing the code, I compiled it and produced an executable file, which I saved onto a virtual floppy disk. To run the game, I started MS-DOS in VMware and mounted the floppy disk. Finally, I was able to successfully run Pong.
-                Pong is a classic arcade game that was first released in 1972 by Atari. It involves two paddles moving up and down on opposite sides of the screen, with the objective being to hit a ball back and forth between them without missing. The game has been remade countless times since its original release and is still enjoyed by gamers today.
-                Developing Pong using assembly language was a challenging but rewarding experience. Assembly language is a low-level programming language that requires a deep understanding of the computer's hardware and memory management. By using emu8086 as the development environment, I was able to simulate the hardware and test my code efficiently.
-                Compiling the code and producing an executable file was a crucial step in the development process. The executable file contained the compiled code that the computer could run, allowing me to play the game without having to type out the code each time.
-                Overall, developing and playing Pong on MS-DOS in a virtual machine was a fun and educational experience. It allowed me to gain a deeper understanding of assembly language programming, hardware simulation, and operating systems.
-
+            
 # How to play
 1) Clone git repository
 2) Setup MS-DOS https://github.com/AlessandroBonomo28/MS-DOS-setup
